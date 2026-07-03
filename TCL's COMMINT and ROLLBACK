@@ -1,0 +1,86 @@
+TCL (Transaction Control Language - İşlem Kontrol Dili), veritabanında
+yaptığınız değişiklikleri yönetmenizi sağlar.
+
+Bunu bir "Geri Al" (Undo) ve "Kaydet" (Save) sistemi gibi düşünebilirsiniz.
+
+1. Görsel Benzetme: Kurşun Kalem ve Silgi
+
+SQL'de bir işlem başlattığınızda, verileri önce "kurşun kalemle" yazarsınız.
+
+  - COMMIT: Yazının üzerinden tükenmez kalemle geçmektir. Artık silinemez,
+    kalıcıdır.
+  - ROLLBACK: Yazıyı silgiyle silmektir. Hiç yazılmamış gibi eski haline döner.
+
+2. COMMIT (Onayla ve Kaydet)
+
+Yaptığınız değişikliklerin kalıcı olmasını sağlar.
+
+Senaryo: Yeni bir çalışan eklediniz ve her şeyin doğru olduğundan eminsiniz.
+
+INSERT INTO dept_emp_dup (emp_no, dept_no) VALUES (101, 'd001');
+
+COMMIT; -- Bu komutla veri artık "betona gömüldü", geri alınamaz.
+
+Görsel Süreç:
+
+1.  Veriyi yazdınız (Geçici hafızada bekliyor).
+2.  COMMIT dediniz.
+3.  Veri diske kaydedildi. ✅
+
+3. ROLLBACK (Geri Al / Vazgeç)
+
+Yaptığınız bir hatayı fark ettiğinizde işlemleri iptal etmek için kullanılır.
+
+Senaryo: Yanlışlıkla bir tabloyu boşalttınız (DELETE)! Eyvah!
+
+DELETE FROM dept_emp_dup; -- Tablodaki her şeyi sildiniz (Hata!)
+
+ROLLBACK; -- "Dur! Az önce yaptığım her şeyi iptal et" demektir.
+
+Görsel Süreç:
+
+1.  Tablo boşaldı (Geçici olarak).
+2.  ROLLBACK dediniz.
+3.  Sihirli bir şekilde veriler geri geldi. ↩️
+
+4. Şematik Akış Diyagramı
+
+İşlemin (Transaction) nasıl çalıştığını buradan takip edebilirsiniz:
+
+BAŞLANGIÇ (START)
+      |
+      v
+  SQL KOMUTU (Örn: INSERT veya DELETE)
+      |
+      v
+-----------------------------------------
+|          KARAR ANI (Senin Kararın)    |
+-----------------------------------------
+      |                         |
+      | (Her şey doğru mu?)      | (Bir hata mı var?)
+      v                         v
+   COMMIT                   ROLLBACK
+      |                         |
+  [ KAYDET ]               [ İPTAL ET ]
+      |                         |
+      v                         v
+VERİTABANINA İŞLENDİ      ESKİ HALİNE DÖNDÜ
+
+5. Önemli Not (Auto-Commit)
+
+Çoğu SQL programı (MySQL Workbench gibi) varsayılan olarak "Auto-commit"
+(Otomatik Kaydet) modundadır. Yani siz INSERT yazdığınız an otomatik COMMIT
+yapar.
+
+Eğer ROLLBACK özelliğini test etmek isterseniz, önce otomatik kaydetmeyi
+kapatmanız gerekir:
+
+SET autocommit = 0; -- Otomatik kaydetmeyi kapat
+
+Özetle:
+
+  - COMMIT: "Tamam, bunu kaydet." 👍
+  - ROLLBACK: "Hayır, hata yaptım, geri al." 👎
+
+Bu sistem sayesinde veritabanında yanlışlıkla veri silmekten korkmanıza gerek
+kalmaz! Başka bir örnek görmek ister misiniz?
