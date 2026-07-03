@@ -1,0 +1,63 @@
+UPDATE komutu, tablodaki mevcut verileri değiştirmek (güncellemek) için
+kullanılır.
+
+Bunu bir formdaki bilgileri silip üzerine yenisini yazmak gibi düşünebilirsiniz.
+✏️
+
+1. Görsel Örnek: Şehir Değiştirme
+
+Diyelim ki bir tablonuz var ve "Ahmet" isimli kişinin şehri yanlış yazılmış.
+İstanbul yerine Ankara yapmak istiyoruz.
+
+Tablonun Eski Hali: | ID | Isim | Sehir | | :--- | :--- | :--- | | 1 | Ahmet |
+İstanbul |
+
+SQL Kodu:
+
+UPDATE Ogrenciler
+SET Sehir = 'Ankara'
+WHERE ID = 1;
+
+Tablonun Yeni Hali: | ID | Isim | Sehir | | :--- | :--- | :--- | | 1 | Ahmet |
+Ankara |
+
+2. UPDATE Komutunun Yapısı (3 Adım)
+
+Bu komutu yazarken şu 3 soruyu sorarız:
+
+1.  UPDATE: Hangi tabloyu güncelleyeceksin? (Ogrenciler)
+2.  SET: Yeni bilgi ne olacak? (Sehir = 'Ankara')
+3.  WHERE: Kimin bilgisi değişecek? (ID = 1)
+
+3. ⚠️ ÇOK ÖNEMLİ UYARI: WHERE Şartı
+
+UPDATE komutunu kullanırken WHERE yazmayı unutursanız, tablodaki HERKESİN
+bilgisi değişir!
+
+Hatalı Örnek:
+
+UPDATE Ogrenciler
+SET Sehir = 'Ankara';
+-- (WHERE yazmadık!)
+
+Sonuç (Felaket): | ID | Isim | Sehir | | :--- | :--- | :--- | | 1 | Ahmet |
+Ankara | | 2 | Mehmet | Ankara | | 3 | Ayşe | Ankara | (Herkes Ankaralı oldu!) 😱
+
+4. UPDATE ve TCL (Rollback) İlişkisi
+
+Biraz önce öğrendiğimiz ROLLBACK burada hayat kurtarır.
+
+1.  UPDATE yaptınız.
+2.  Hata yaptığınızı (herkesin değiştiğini) fark ettiniz.
+3.  Hemen ROLLBACK; yazarsanız veriler eski haline döner.
+4.  Eğer her şey doğruysa COMMIT; yazıp kaydedersiniz.
+
+Özet Görsel Şema
+
+| Komut Parçası | Görevi          | Görsel Karşılığı              |
+| :------------ | :-------------- | :---------------------------- |
+| **UPDATE**    | Tablo Seç       | 📄 (Kağıdı seç)                |
+| **SET**       | Yeni Veriyi Yaz | ✍️ (Üzerine yeni ismi yaz)    |
+| **WHERE**     | Hedefi Belirle  | 🎯 (Sadece bu kişiyi değiştir) |
+
+
