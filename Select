@@ -1,0 +1,67 @@
+select S.name
+from students S
+where S.sid IN (select E.sid
+                from enrolled E
+                where E.cid='BIL344')
+
+
+Dinlenmiş olduğunda bu konuya bakman harika. Bu sorgu aslında iki farklı listeyi
+birleştirmek gibidir.
+
+Bunu bir Okul Senaryosu ile görselleştirelim:
+
+Elimizde iki tane kağıt (tablo) var:
+
+1.  Students (Öğrenciler): Öğrencinin adı ve numarası (sid) yazıyor.
+2.  Enrolled (Kayıtlar): Hangi öğrenci (sid) hangi dersi (cid) almış o yazıyor.
+
+1. Adım: İçerideki Sorgu (Parantez İçi)
+
+SELECT E.sid FROM Enrolled E WHERE E.cid='BIL344'
+
+Bilgisayar önce bu parantezin içine bakar. "BIL344" dersini alan öğrencilerin
+numaralarını (sid) bir liste yapar.
+
+Görsel Liste (Parantez içi):
+
+  - 101
+  - 105
+  - 110 (Bunlar BIL344 dersine giden öğrencilerin numaraları)
+
+2. Adım: Dışarıdaki Sorgu ve "IN" Mantığı
+
+SELECT S.name FROM Students S WHERE S.sid IN (...)
+
+Şimdi bilgisayar ana öğrenci listesine gider ve tek tek sorar: "Senin numaran,
+az önce bulduğum o listede var mı (IN)?"
+
+  - Öğrenci Ali (sid: 101): "Senin numaran 101, listede var mı?" ➔ EVET (Ali'nin
+    ismini kenara yazar).
+  - Öğrenci Ayşe (sid: 102): "Senin numaran 102, listede var mı?" ➔ HAYIR (Onu
+    atlar).
+  - Öğrenci Can (sid: 105): "Senin numaran 105, listede var mı?" ➔ EVET (Can'ın
+    ismini kenara yazar).
+
+3. Görsel Şema
+
+  ÖĞRENCİ TABLOSU (Students)            KAYIT TABLOSU (Enrolled)
+  --------------------------            -------------------------
+  sid | name                            sid | cid
+  ----|-------                          ----|-------
+  101 | Ali    <--- EŞLEŞTİ ✅           101 | BIL344
+  102 | Ayşe                            105 | BIL344
+  105 | Can    <--- EŞLEŞTİ ✅           110 | BIL344
+  110 | Ece    <--- EŞLEŞTİ ✅           120 | MAT101 (Buna bakmaz)
+
+SONUÇ: Ali, Can, Ece
+
+Özetle Bu Sorgu Şunu Der:
+
+"Bana, BIL344 dersine kayıtlı olan öğrencilerin isimlerini getir."
+
+  - Parantez içi: "Dersteki numaraları bul."
+  - Dışarısı: "O numaralar hangi isimlere aitse onları yazdır."
+
+IN burada bir "Filtre" görevi görür. Sadece listede olanları içeri alır.
+
+Anlatım yeterince net oldu mu? Yorulduysan sonra cevap verebilirsin. 😊
