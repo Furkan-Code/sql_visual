@@ -1,0 +1,113 @@
+Seni çok iyi anlıyorum. COALESCE biraz karışık gelebilir, o yüzden daha basit ve
+tamamen görsel bir örnek yapalım.
+
+Şöyle düşün: Bir tane Hediye arıyorsun ve önünde 4 tane kutu var.
+
+Görsel Mantık: "İlk Dolu Kutuyu Bul"
+
+Senaryo:
+
+  - 1. Kutu: 📦 (Boş)
+  - 2. Kutu: 📦 (Boş)
+  - 3. Kutu: 🎁 (İçinde hediye var - DOLU)
+  - 4. Kutu: 🧸 (İçinde oyuncak var - DOLU)
+
+Soru: COALESCE(1.Kutu, 2.Kutu, 3.Kutu, 4.Kutu) işlemini yaparsak bilgisayar neyi
+seçer?
+
+Bilgisayarın gözüyle adım adım bakalım:
+
+1.  1. Kutuya bakar: "Boş mu?" ➔ EVET. (O zaman bunu geç, bir sonrakine bak).
+2.  2. Kutuya bakar: "Boş mu?" ➔ EVET. (Bunu da geç).
+3.  3. Kutuya bakar: "Boş mu?" ➔ HAYIR, DOLU! (Hediye 🎁 buldu).
+
+SONUÇ: Bilgisayar 3. Kutudaki Hediyeyi (🎁) alır ve DURUR. (4. Kutuda oyuncak 🧸
+olsa bile ona bakmaz, çünkü ilk doluyu buldu.)
+
+Bir de Tablo Üzerinde Görelim
+
+Birinin adresine ulaşmaya çalışıyoruz. Elimizde 3 tane sütun var.
+
+| İsim     | Ev Adresi    | İş Adresi  | Şehir      | **COALESCE Sonucu**    |
+| :------- | :----------- | :--------- | :--------- | :--------------------- |
+| **Ali**  | NULL (Boş)   | NULL (Boş) | **Ankara** | ➔ **Ankara**'yı alır.  |
+| **Ayşe** | **İstanbul** | NULL (Boş) | Ankara     | ➔ **İstanbul**'u alır. |
+
+Neden?
+
+  - Ali için: Ev boş, İş boş, ama Şehir Ankara dolu. O yüzden Ankara'yı seçti.
+  - Ayşe için: Ev adresi İstanbul dolu. İlk kutu dolu olduğu için diğerlerine
+    (İş ve Şehir) hiç bakmadı bile. İstanbul'u seçti.
+
+Özetle COALESCE şudur:
+
+1.  Soldan sağa doğru kutulara (sütunlara) bak.
+2.  NULL (Boş) olanları atla.
+3.  İLK DOLU olan veriyi gördüğünde onu yakala ve ekrana yaz.
+
+Şu çizim mantığına bak:
+
+COALESCE ( NULL, NULL, 'ELMA', 'ARMUT' )
+
+1.  ❌ (Boş)
+2.  ❌ (Boş)
+3.  ✅ ELMA (BULDUM!) ➔ Sonuç: ELMA
+
+Şimdi biraz daha netleşti mi? İstersen başka bir görsel örnek daha verebilirim.
+
+
+İFNULL
+
+Harikasın! Tam olarak doğru anladın. 🎯
+
+Mantığın %100 doğru: "Eğer birinci kutu boşsa, ekrana benim istediğim o yazıyı
+(veya sayıyı) yaz."
+
+Senin verdiğin örnek üzerinden görselleştirelim:
+
+IFNULL( Telefon, 'Bulamadı' )
+
+Bilgisayar listeye bakıyor:
+
+1.  Müşteri Ali: Telefonu var (555...).
+
+      - Sonuç: 555... (Çünkü bilgi var, 'Bulamadı' yazmasına gerek yok).
+
+2.  Müşteri Ayşe: Telefon kısmı BOŞ (NULL).
+
+      - Sonuç: 'Bulamadı' (Çünkü kutu boştu, hemen senin dediğin yedek yazıyı
+        yapıştırdı).
+
+Görsel Tablo:
+
+| İsim   | Telefon (Ham Veri) | **IFNULL(Telefon, 'Bulamadı')** |
+| :----- | :----------------- | :------------------------------ |
+| Ali    | 555 12 12          | **555 12 12**                   |
+| Ayşe   | **NULL (Boş)**     | **Bulamadı** ❌                  |
+| Mehmet | 542 00 00          | **542 00 00**                   |
+| Fatma  | **NULL (Boş)**     | **Bulamadı** ❌                  |
+
+Bunu Neden Yaparız? (Görsel Sebep)
+
+Bir rapor hazırladığını düşün. Raporda "NULL" yazması çok çirkin ve kafa
+karıştırıcıdır. Onun yerine:
+
+  - "Bulamadı"
+  - "Hatalı"
+  - "Bilgi Yok"
+  - "0" (Sayılar için)
+
+yazmak, raporu okuyan kişinin (örneğin müdürünün) işini kolaylaştırır.
+
+Küçük Bir Not:
+
+Senin "Bulamadı" örneğin çok güzel. Eğer oraya 'Bulamadı' yerine 0 yazarsan; boş
+olan yerlere 0 yazar. Yani ikinci kısma ne yazarsan, boş kutunun içine o dolar.
+
+Özet:
+
+  - Kutu Doluysa: İçindeki orijinal bilgiyi ver. ✅
+  - Kutu Boşsa: Benim yazdığım 'Bulamadı' yazısını ver. ✍️
+
+Harika gidiyorsun! Başka bir örnek ya da başka bir fonksiyon (mesela MAX veya
+MIN) ister misin?
