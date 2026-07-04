@@ -111,3 +111,58 @@ olan yerlere 0 yazar. Yani ikinci kısma ne yazarsan, boş kutunun içine o dola
 
 Harika gidiyorsun! Başka bir örnek ya da başka bir fonksiyon (mesela MAX veya
 MIN) ister misin?
+
+
+
+
+
+
+
+
+
+TAMAMEN DOĞRU! Harikasın, mantığı mükemmel çözmüşsün. 🎯
+
+Senin verdiğin bu örnek üzerinden bir tablo yapalım, görsel olarak iyice
+pekişsin.
+
+Örnek: COALESCE(dept_manager, dept_name)
+
+Diyelim ki bir şirket listemiz var:
+
+| Satır        | dept\_manager (Müdür) | dept\_name (Bölüm Adı) | **COALESCE Sonucu**  |
+| :----------- | :-------------------- | :--------------------- | :------------------- |
+| **1. Satır** | 👔 Ali Yılmaz          | 🏢 Satış                | **Ali Yılmaz**       |
+| **2. Satır** | ❌ **NULL** (Boş)      | 🏢 Pazarlama            | **Pazarlama**        |
+| **3. Satır** | 👔 Ayşe Can            | 🏢 Muhasebe             | **Ayşe Can**         |
+| **4. Satır** | ❌ **NULL** (Boş)      | 🏢 İnsan Kaynakları     | **İnsan Kaynakları** |
+
+Neler Oldu? (Adım Adım Görsel Analiz)
+
+1.  1. Satırda: Bilgisayar önce dept_manager kutusuna baktı. İçinde "Ali Yılmaz"
+    var (DOLU). Hemen onu aldı.
+2.  2. Satırda: Bilgisayar dept_manager kutusuna baktı, BOŞ. Hemen yanındaki
+    dept_name kutusuna zıpladı. Orada "Pazarlama" yazısını gördü ve onu aldı.
+
+Neden Çok Akıllıca Bir Yöntem?
+
+Senin bu örneğin gerçek hayatta çok kullanılır. Mesela bir raporda şöyle bir
+başlık atmak istersin: "Sorumlu Kişi veya Birim"
+
+  - Eğer bir müdür atanmışsa, onun adını yazdırırsın.
+  - Eğer henüz bir müdür yoksa, boş bırakmak yerine "Hangi bölüm" olduğunu
+    yazdırırsın.
+
+Böylece raporun hiçbir zaman boş kalmaz.
+
+İstersek Bir "Yedek" Daha Ekleyebiliriz:
+
+COALESCE(dept_manager, dept_name, 'BİLGİ YOK')
+
+  - Müdür boşsa ➔ Bölüm Adına bak.
+  - Bölüm Adı da boşsa ➔ Ekrana "BİLGİ YOK" yaz.
+
+Özet: Sen bu işi kaptın! COALESCE için yaptığın bu "O yoksa diğeri" tanımı en
+doğru tanım.
+
+Başka sormak istediğin bir şey var mı? Çok iyi ilerliyorsun! 👏
+
