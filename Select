@@ -65,3 +65,74 @@ SONUÇ: Ali, Can, Ece
 IN burada bir "Filtre" görevi görür. Sadece listede olanları içeri alır.
 
 Anlatım yeterince net oldu mu? Yorulduysan sonra cevap verebilirsin. 😊
+
+
+
+select S.name
+from students S
+where S.sid IN (select E.sid
+                from enrolled E
+            	where E.cid IN (select C.cid
+                				from courses C
+                 				where C.cname='OS' OR C.cname='OOP' ) )
+
+
+
+Bu sorgu, bir önceki öğrendiğinin bir adım daha gelişmiş hali. Buna "İç İçe Üçlü
+Sorgu" diyoruz. Bunu 3 katlı bir kutu gibi düşünebilirsin.
+
+En içteki kutudan başlayarak dışarı doğru çıkalım.
+
+1. Kat (En İçteki Kutu): Ders İsimlerinden ID Bulma
+
+SELECT C.cid FROM courses C WHERE C.cname='OS' OR C.cname='OOP'
+
+Bilgisayar önce en derine iner. Kurslar listesine (Courses) bakar:
+
+  - "OS" dersinin numarası (cid) nedir? ➔ 101 olsun.
+  - "OOP" dersinin numarası (cid) nedir? ➔ 202 olsun.
+
+İçeriden çıkan sonuç: {101, 202}
+
+2. Kat (Orta Kutu): Bu Dersleri Alan Öğrencileri Bulma
+
+SELECT E.sid FROM enrolled E WHERE E.cid IN (101, 202)
+
+Şimdi kayıt listesine (Enrolled) gider ve şunu sorar: "Bana 101 veya 202
+numaralı derslere kayıt olan öğrencilerin numaralarını (sid) ver."
+
+Ortadan çıkan sonuç (Öğrenci Numaraları):
+
+  - Ali'nin numarası: 10
+  - Can'tın numarası: 20
+
+3. Kat (En Dış Kutu): İsimleri Yazdırma
+
+SELECT S.name FROM students S WHERE S.sid IN (10, 20)
+
+En son ana listeye (Students) gider: "Numarası 10 ve 20 olan öğrencilerin
+isimlerini ekrana yaz."
+
+EKRAN ÇIKTISI:
+
+  - Ali
+  - Can
+
+Görsel Özet (Adım Adım Yolculuk)
+
+1.  Dersler: OS veya OOP olanların ID'sini bul. ➔ (Ders 101, Ders 202)
+2.  Kayıtlar: Bu derslere giden Öğrenci Numaralarını bul. ➔ (Öğrenci 10,
+    Öğrenci 20)
+3.  Öğrenciler: Bu numaraların İsimlerini yazdır. ➔ Ali, Can
+
+Neden "OR" Kullandık?
+
+C.cname='OS' OR C.cname='OOP' dediğimiz için; öğrenci isterse sadece "OS" alsın,
+isterse sadece "OOP" alsın, her iki durumda da listede görünür.
+
+Basitçe Şöyle Diyebiliriz: "Bana OS veya OOP derslerinden en az birine kayıtlı
+olan öğrencilerin isimlerini getir."
+
+Bu 3 katlı mantık kafana yattı mı? Sanki bir dedektif gibi iz sürüyorsun: Ders
+İsmi ➔ Ders ID ➔ Öğrenci ID ➔ Öğrenci İsmi.
+
