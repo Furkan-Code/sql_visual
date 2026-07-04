@@ -1,0 +1,85 @@
+JOIN (Birleştirme), SQL’in en güçlü ve en önemli konusudur! 🧩
+
+Birbirinden ayrı duran iki tabloyu, ortak bir nokta (sütun) üzerinden
+birleştirip tek bir tablo gibi görmemizi sağlar.
+
+Bunu iki yapboz parçasını birbirine takmak veya bir fermuarı kapatmak gibi
+düşünebilirsiniz. 🔗
+
+1. Neden JOIN Kullanırız? (Görsel Senaryo)
+
+Elimizde iki ayrı tablo olsun:
+
+1. Tablo: Çalışanlar (employees) | emp_no | isim | | :--- | :--- | | 101 | Ahmet
+| | 102 | Ayşe |
+
+2. Tablo: Maaşlar (salaries) | emp_no | maas | | :--- | :--- | | 101 | 50.000 TL
+| | 102 | 60.000 TL |
+
+Sorun: Ahmet'in maaşı ne kadar? Bunu görmek için iki tabloyu emp_no (Çalışan
+Numarası) üzerinden birleştirmemiz lazım!
+
+2. INNER JOIN (En Çok Kullanılan)
+
+İki tabloda da ortak eşleşen verileri yan yana getirir.
+
+Venn Şeması (Görsel Mantık):
+
+  Tablo A          Tablo B
+ (Çalışan)        (Maaşlar)
+   ___              ___
+  /   \            /   \
+ |     \  ORTAK   /     |
+ |      (Kesişim)       |  <-- INNER JOIN sadece burayı alır!
+  \    ___/  \___      /
+   \__/          \____/
+
+SQL Kodu:
+
+SELECT employees.isim, salaries.maas
+FROM employees
+INNER JOIN salaries ON employees.emp_no = salaries.emp_no;
+
+Kodun Anlamı:
+
+  - FROM employees: Çalışanlar tablosunu al.
+  - INNER JOIN salaries: Maaşlar tablosunu yanına ekle.
+  - ON ... = ...: Fermuarın dişi nereden birleşecek? (emp_no sütunlarından
+    birleşecek).
+
+Sonuç Tablosu (İkisi Birleşti!): | isim | maas | | :--- | :--- | | Ahmet
+| 50.000 TL | | Ayşe | 60.000 TL |
+
+3. Diğer JOIN Çeşitleri (Görsel Özet)
+
+Bazen her çalışanın maaş bilgisi olmayabilir veya boşluklar olabilir. İşte o
+zaman farklı JOIN türleri kullanırız:
+
+| JOIN Türü      | Görsel Mantık       | Ne Yapar?                                                                            |
+| :------------- | :------------------ | :----------------------------------------------------------------------------------- |
+| **INNER JOIN** | 🟢 **\[ A ∩ B \]** 🟢 | Sadece **her iki tabloda da eşleşenleri** getirir.                                   |
+| **LEFT JOIN**  | 🟢 **\[ A \]** ⚪ B   | **Soldaki (İlk) tablonun hepsini** alır. Sağda eşleşmeyen varsa boş (NULL) yazar.    |
+| **RIGHT JOIN** | A ⚪ **\[ B \]** 🟢   | **Sağdaki (İkinci) tablonun hepsini** alır. Solda eşleşmeyen varsa boş (NULL) yazar. |
+
+4. Şematik Akış: JOIN Nasıl Çalışır?
+
+[ TABLO 1: Çalışanlar ]          [ TABLO 2: Departmanlar ]
+   emp_no | isim                    dept_no | dept_name
+   ----------------                 -------------------
+   101    | Ahmet                    d001   | IT
+   102    | Ayşe                     d002   | İK
+      \                                /
+       \--- ORTAK NOKTA NEDİR? -------/
+        (Örn: İki tabloda da dept_no varsa)
+                     |
+                     v
+             [ YENİ SONUÇ ]
+       Ahmet | IT
+       Ayşe  | İK
+
+Önemli İpucu: ON kelimesinden sonra yazdığımız eşitlik (tablo1.id = tablo2.id),
+SQL'e "Bu iki tabloyu hangi köprüyle bağlayayım?" sorusunun cevabıdır. Bu
+köprüyü doğru göstermek çok önemlidir.
+
+JOIN konusu biraz geniş, şu an çalıştığınız özel bir JOIN örneği var mı? Onun
+üzerinden görselleştirelim!
