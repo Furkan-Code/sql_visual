@@ -1,0 +1,85 @@
+Subqueries (Alt Sorgular), SQL içinde en heyecan verici konulardan biridir.
+Basitçe anlatmak gerekirse: Bir SQL sorgusunun içinde başka bir SQL sorgusunun
+olmasıdır.
+
+Bunu bir "Matruşka Bebeği" 🪆 gibi veya iç içe geçmiş kutular gibi
+düşünebilirsiniz.
+
+1. Görsel Mantık: İç Kutu ve Dış Kutu
+
+SQL önce içerideki kutuyu açar, cevabı bulur; sonra o cevabı kullanarak
+dışarıdaki kutuyu (ana sorguyu) çözer.
+
++--------------------------------------------------+
+| ANA SORGU (Dış Kutu)                             |
+|                                                  |
+|   SELECT isim FROM calisanlar WHERE maas > (     |
+|      +----------------------------------------+  |
+|      | ALT SORGU (İç Kutu)                    |  |
+|      |                                        |  |
+|      |   SELECT AVG(maas) FROM calisanlar     |  |
+|      +----------------------------------------+  |
+|   );                                             |
++--------------------------------------------------+
+
+2. Örnek Üzerinden Gidelim 💰
+
+Soru: "Maaşı, şirketin ortalama maaşından daha yüksek olan kişileri getir."
+
+Burada aslında iki iş var:
+
+1.  Şirketin ortalama maaşı nedir? (Bunu bilmiyoruz)
+2.  Kimler bu rakamdan çok alıyor?
+
+SQL bunu şöyle yapar:
+
+SELECT isim, maas
+FROM calisanlar
+WHERE maas > (SELECT AVG(maas) FROM calisanlar); -- Alt sorgu
+
+Çalışma Sırası (Görsel Adımlar):
+
+1.  Adım (İç Sorgu): SQL önce parantez içine bakar. SELECT AVG(maas) diyelim ki
+    sonucu 50.000 buldu.
+2.  Adım (Ana Sorgu): Şimdi sorgu şuna dönüştü: SELECT isim FROM calisanlar
+    WHERE maas > 50000;
+3.  Sonuç: Maaşı 50 binden büyük olanlar listelenir. ✅
+
+3. Subquery'nin En Çok Kullanıldığı Yerler
+
+Alt sorguları sadece WHERE içinde değil, başka yerlerde de kullanabiliriz:
+
+| Yer               | Görsel Mantık                       | Örnek                                               |
+| :---------------- | :---------------------------------- | :-------------------------------------------------- |
+| **WHERE İçinde**  | Filtre olarak kullanılır.           | Maaşı X'ten büyük olanları bul.                     |
+| **FROM İçinde**   | Geçici bir tablo gibi davranır.     | Önce veriyi süz, sonra o süzülmüş veriden seç.      |
+| **SELECT İçinde** | Her satırın yanına bir bilgi ekler. | Kişinin isminin yanına toplam şirket bütçesini yaz. |
+
+4. Subquery vs JOIN (Hangisi Daha İyi?)
+
+İkisi de çoğu zaman aynı sonucu verir.
+
+  - JOIN: Daha hızlıdır ⚡ ve tabloları yan yana birleştirir.
+  - Subquery: Okuması daha kolaydır 📖 (insan mantığına daha yakındır).
+
+5. Şematik Özet
+
+Soru: "Hangi departmanlarda hiç çalışan yok?"
+
+[ ANA SORGU: Departmanları getir ]
+       |
+       v
+   [ WHERE dept_no NOT IN ]
+           |
+           v
+       [ ALT SORGU: Çalışanlar tablosundaki tüm dept_no'ları listele ]
+
+Özetle Subquery:
+
+1.  Parantez içinde yazılır ( ... ).
+2.  Önce parantez içi çalışır.
+3.  Çıkan sonuç, dışarıdaki sorgu için bir "anahtar" olur.
+
+Alt sorgular (Subqueries) biraz pratikle çok eğlenceli hale gelir. Bir tane
+karmaşık alt sorgu örneği yazmamı ister misiniz? Yoksa bu temel mantık sizin
+için yeterli mi?
