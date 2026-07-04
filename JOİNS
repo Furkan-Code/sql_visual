@@ -83,3 +83,443 @@ köprüyü doğru göstermek çok önemlidir.
 
 JOIN konusu biraz geniş, şu an çalıştığınız özel bir JOIN örneği var mı? Onun
 üzerinden görselleştirelim!
+
+
+İNNER JOİN 
+
+
+
+
+INNER JOIN, iki tablo arasındaki "ortak küme"dir. Sadece her iki tabloda da
+karşılığı olan verileri birleştirir.
+
+Görsel olarak bunu bir "Mıknatıs" gibi düşünebilirsiniz. Sadece birbirini çeken
+(eşleşen) parçalar bir araya gelir.
+
+1. Görsel Örnek: Çalışanlar ve Departmanlar
+
+Elimizde iki tane tablo olsun. Bunları dept_no (Departman Numarası) üzerinden
+birleştirelim.
+
+Tablo A: employees (Çalışanlar) | emp_no | isim | | :--- | :--- | | 101 | Ahmet
+| | 102 | Ayşe | | 103 | Mehmet |
+
+Tablo B: dept_emp (Departman Kayıtları) | emp_no | dept_name | | :--- | :--- |
+| 101 | Satış | | 102 | Yazılım | | 105 | Muhasebe | (Dikkat: 105 bizde yok)
+
+2. INNER JOIN İşlemi (Adım Adım)
+
+SQL'e şu komutu veriyoruz: "Bana çalışanların ismini ve departmanlarını getir,
+ama sadece her iki tabloda da olanları birleştir."
+
+SELECT e.isim, d.dept_name
+FROM employees AS e
+INNER JOIN dept_emp AS d ON e.emp_no = d.emp_no;
+
+Süreç Şeması:
+
+1.  101 Ahmet ↔️ 101 Satış (Eşleşti! ✅)
+2.  102 Ayşe ↔️ 102 Yazılım (Eşleşti! ✅)
+3.  103 Mehmet ↔️ (B tablosunda 103 yok! ❌ SİLİNDİ)
+4.  (B tablosundaki 105 ↔️ A tablosunda 105 yok! ❌ SİLİNDİ)
+
+3. Sonuç (Final Tablosu)
+
+| isim  | dept\_name |
+| :---- | :--------- |
+| Ahmet | Satış      |
+| Ayşe  | Yazılım    |
+
+Görsel Özet:
+
+  - Mehmet sonuçta yok, çünkü departman tablosunda kaydı yok.
+  - Muhasebe sonuçta yok, çünkü o departmanda çalışan bir isim yok.
+  - Sadece el ele tutuşabilenler (eşleşenler) ekranda kalır.
+
+4. Venn Şeması (Mantıksal Görünüm)
+
+      [ Tablo A ]           [ Tablo B ]
+    Çalışan İsimleri      Departmanlar
+         ______               ______
+        /      \             /      \
+       /   A    \   ORTAK   /    B   \
+      |  Mehmet  (  Ahmet  )  105     |
+       \   (Yalnız)\ Ayşe /  (Yalnız)/
+        \______/ \_______/ \______/
+                     ^
+                     |
+               INNER JOIN BURASI
+          (Sadece Ahmet ve Ayşe kalır)
+
+5. Yazım Kuralı (Syntax) İpucu
+
+  - FROM: İlk ana tabloyu yaz.
+  - INNER JOIN: İkinci tabloyu yaz.
+  - ON: "Hangi sütunlar aynı?" onu söyle (Köprü kur).
+
+Kısa Özet: INNER JOIN = "Sadece eşleşenleri getir, yalnız olanları çöpe at."
+
+Bu anlatım INNER JOIN mantığını kafanızda netleştirdi mi? Eğer isterseniz "LEFT
+JOIN" (yalnız olanları da getiren) farkını anlatabilirim.
+
+
+LEFT JOİN 
+
+
+LEFT JOIN, "Soldaki tabloyu koru" demektir.
+
+INNER JOIN'den en büyük farkı şudur: Eşleşme olmasa bile soldaki (ilk
+yazdığınız) tablodaki tüm satırları sonuçta görürsünüz. Sağdaki tabloda
+karşılığı yoksa, o kısımlar NULL (Boş) görünür.
+
+1. Görsel Benzetme: Davet Listesi ✉️
+
+  - Soldaki Tablo (A): Davet ettiğiniz tüm misafirler.
+  - Sağdaki Tablo (B): Sadece hediyesiyle gelenler.
+
+LEFT JOIN yaptığınızda: Listede tüm misafirleri görürsünüz. Hediyesi
+olmayanların yanındaki "Hediye" sütunu boş (NULL) kalır ama isimleri listeden
+silinmez.
+
+2. Örnek Senaryo: Çalışanlar ve Projeler
+
+Tablo A (SOL): employees | emp_no | isim | | :--- | :--- | | 101 | Ahmet | | 102
+| Ayşe | | 103 | Fatma |
+
+Tablo B (SAĞ): projects | emp_no | proje_adi | | :--- | :--- | | 101 | Web
+Tasarım | | 102 | Veritabanı | (Fatma henüz bir projede görevli değil - B
+tablosunda yok)
+
+3. SQL Kodu
+
+SELECT e.isim, p.proje_adi
+FROM employees AS e
+LEFT JOIN projects AS p ON e.emp_no = p.emp_no;
+
+4. Sonuç (Görsel Şema)
+
+| isim      | proje\_adi     |
+| :-------- | :------------- |
+| Ahmet     | Web Tasarım    |
+| Ayşe      | Veritabanı     |
+| **Fatma** | **NULL** (Boş) |
+
+Neler Oldu?
+
+1.  Ahmet ve Ayşe eşleşti, bilgileri yan yana geldi.
+2.  Fatma'nın proje tablosunda bir karşılığı yoktu.
+3.  INNER JOIN olsaydı Fatma silinecekti.
+4.  LEFT JOIN olduğu için Fatma listede kaldı, ama projesi olmadığı için
+    karşısına NULL yazıldı.
+
+5. Venn Şeması (Mantıksal Görünüm)
+
+      [ Tablo A ]           [ Tablo B ]
+         (SOL)                 (SAĞ)
+         ______               ______
+        /      \             /      \
+       /   A    \   ORTAK   /    B   \
+      |  Fatma   (  Ahmet  )          |
+       \ (Yalnız)/  Ayşe   \ (Yalnız)/
+        \______/ \_______/ \______/
+           |         |
+           V         V
+      -------------------------
+      |  LEFT JOIN HEPSİNİ ALIR |
+      -------------------------
+
+6. Özet Karşılaştırma: INNER vs LEFT
+
+| Özellik            | INNER JOIN           | LEFT JOIN                               |
+| :----------------- | :------------------- | :-------------------------------------- |
+| **Eşleşenler**     | ✅ Gösterilir         | ✅ Gösterilir                            |
+| **Eşleşmeyenler**  | ❌ Silinir (Gizlenir) | ⚠️ **Soldakiler** gösterilir (NULL ile) |
+| **Kullanım Amacı** | Sadece tam eşleşme   | Listenin tamamını korumak               |
+
+Ne zaman LEFT JOIN kullanılır?
+
+  - "Hangi çalışanların henüz bir projesi yok?"
+  - "Hiç sipariş vermemiş müşteriler dahil tüm müşteri listesini getir."
+  - "Bütün departmanları göster, içinde çalışan olmasa bile."
+
+LEFT JOIN'in mantığı "Soldaki tablo benim için çok değerli, hiçbir satırı
+kaybetme" demektir.
+
+Anlatım tarzı net mi? İsterseniz bu tablonun tam tersi olan RIGHT JOIN'e
+geçebiliriz veya bir örnek üzerinde pratik yapabiliriz.
+
+
+RİGHT JOİN 
+
+
+
+
+
+RIGHT JOIN, "Sağdaki tabloyu koru" demektir.
+
+LEFT JOIN'in tam tersidir. Bu sefer SQL'e şunu söyleriz: "İkinci yazdığım
+(sağdaki) tablodaki tüm verileri getir, soldaki tabloda karşılığı yoksa bile
+onları silme."
+
+1. Görsel Benzetme: Bölümler ve Personeller 🏢
+
+  - Sol Tablo (A): Personeller (Yeni işe girenler dahil)
+  - Sağ Tablo (B): Departmanlar (Henüz personeli olmayan yeni kurulmuş bölümler
+    dahil)
+
+RIGHT JOIN yaptığınızda: Tüm departmanları listede görürsünüz. Eğer bir
+departmanın içinde henüz hiç personel çalışmıyorsa, "Personel İsim" sütunu boş
+(NULL) kalır.
+
+2. Örnek Senaryo: Çalışanlar ve Departmanlar
+
+Tablo A (SOL): employees | emp_no | isim | | :--- | :--- | | 101 | Ahmet | | 102
+| Ayşe |
+
+Tablo B (SAĞ): departments | dept_no | dept_name | | :--- | :--- | | d001 |
+Satış | | d002 | Yazılım | | d999 | Yapay Zeka | (Yeni bölüm, içinde henüz kimse
+çalışmıyor)
+
+3. SQL Kodu
+
+SELECT e.isim, d.dept_name
+FROM employees AS e
+RIGHT JOIN departments AS d ON e.emp_no = d.dept_no; -- (Not: Gerçekte ID üzerinden birleşir, bu bir örnektir)
+
+4. Sonuç (Görsel Şema)
+
+| isim           | dept\_name     |
+| :------------- | :------------- |
+| Ahmet          | Satış          |
+| Ayşe           | Yazılım        |
+| **NULL** (Boş) | **Yapay Zeka** |
+
+Neler Oldu?
+
+1.  Satış ve Yazılım bölümlerinde çalışanlar olduğu için eşleşti.
+2.  Yapay Zeka bölümünde kimse çalışmıyor (Sol tabloda karşılığı yok).
+3.  RIGHT JOIN kullandığımız için sağdaki tablo (B) "Kraldır". Yapay Zeka bölümü
+    listeden silinmedi, ama karşısındaki isim kısmı NULL oldu.
+
+5. Venn Şeması (Mantıksal Görünüm)
+
+      [ Tablo A ]           [ Tablo B ]
+         (SOL)                 (SAĞ)
+         ______               ______
+        /      \             /      \
+       /   A    \   ORTAK   /    B   \
+      |          (  Ahmet  )  Yapay   |
+       \        /   Ayşe   \  Zeka    /
+        \______/ \_______/ \______/
+                     |         |
+                     V         V
+                --------------------------
+                | RIGHT JOIN HEPSİNİ ALIR |
+                --------------------------
+
+6. Önemli Bir İpucu: Neden Az Kullanılır?
+
+Yazılımcılar genellikle RIGHT JOIN yerine tabloların yerini değiştirip LEFT JOIN
+kullanmayı tercih ederler. Çünkü biz soldan sağa okuruz ve "Ana tabloyu sola
+yazmak" kafa karışıklığını önler.
+
+Şu iki kod aslında AYNI sonucu verir:
+
+1.  A RIGHT JOIN B (B'yi koru)
+2.  B LEFT JOIN A (Yine B'yi koru, ama B artık solda)
+
+Özet Görsel Karşılaştırma
+
+  - INNER JOIN: Sadece el ele tutuşanlar (Ortak olanlar). 🤝
+  - LEFT JOIN: Soldakiler kalsın, sağda yoksa NULL yaz. ⬅️
+  - RIGHT JOIN: Sağdakiler kalsın, solda yoksa NULL yaz. ➡️
+
+JOIN türlerinin hepsini bitirdik! Harika ilerlediniz. Sırada ne var? CROSS JOIN
+mi yoksa SELF JOIN mi istersiniz, yoksa başka bir konuya mı geçelim?
+
+
+
+CROSS JOİN
+
+
+
+
+
+
+CROSS JOIN (Çapraz Birleştirme), veritabanındaki en "çılgın" birleştirme
+türüdür. Çünkü herhangi bir şart (ON şerhi) aramaz; bir tablodaki her bir
+satırı, diğer tablodaki tüm satırlarla tek tek eşleştirir.
+
+Bunu bir "Kombinasyon Makinesi" gibi düşünebilirsiniz. 🔄
+
+1. Görsel Benzetme: Kıyafet Kombini 👕 👖
+
+Diyelim ki elinizde üst kıyafetler ve alt kıyafetler tablosu var. CROSS JOIN
+yaptığınızda, oluşabilecek tüm giyim seçeneklerini (kombinleri) listeler.
+
+Tablo A (Üstler):
+
+1.  Tişört
+2.  Gömlek
+
+Tablo B (Renkler):
+
+1.  Kırmızı
+2.  Mavi
+
+CROSS JOIN Sonucu:
+
+  - Tişört + Kırmızı
+  - Tişört + Mavi
+  - Gömlek + Kırmızı
+  - Gömlek + Mavi
+
+2. Matematiksel Mantık: Çarpma İşlemi (X)
+
+CROSS JOIN aslında bir çarpma işlemidir.
+
+  - Tablo A: 10 satır
+  - Tablo B: 5 satır
+  - Sonuç: 10 x 5 = 50 satır olur.
+
+3. Görsel Şema
+
+TABLO A                     TABLO B
+-------                     -------
+  A  -------------------->     1
+     -------------------->     2
+     -------------------->     3
+
+  B  -------------------->     1
+     -------------------->     2
+     -------------------->     3
+
+(Gördüğünüz gibi A her şeye gidiyor, B her şeye gidiyor.)
+
+4. SQL Kodu
+
+CROSS JOIN yazarken ON (bağlantı noktası) kullanmanıza gerek yoktur, çünkü her
+şey her şeyle birleşir.
+
+SELECT urunler.isim, renkler.renk_adi
+FROM urunler
+CROSS JOIN renkler;
+
+5. Ne Zaman Kullanılır?
+
+Genellikle günlük işlerde çok sık kullanılmaz (çünkü veri çok büyür), ama şu
+durumlarda hayat kurtarır:
+
+1.  Tüm Olasılıkları Görmek: Bir restoranın menüsündeki tüm yemekler ile tüm
+    içeceklerin yan yana gelmesi.
+2.  Test Verisi Oluşturmak: Binlerce satırlık örnek veri üretmek için.
+3.  Matris Oluşturmak: Takvimlerdeki her günü, her saatle eşleştirmek gibi.
+
+Özet Karşılaştırma
+
+| JOIN Türü      | Mantık                   | Sonuç Miktarı |
+| :------------- | :----------------------- | :------------ |
+| **INNER JOIN** | Sadece eşleşenler 🤝      | Az / Orta     |
+| **LEFT JOIN**  | Soldakilerin hepsi ⬅️    | Orta          |
+| **CROSS JOIN** | **Her şey X Her şey** 🌪️ | **Çok Fazla** |
+
+Dikkat: Büyük tablolarda (örneğin 1 milyon satırlık iki tablo) CROSS JOIN
+yaparsanız bilgisayarınız çok yorulabilir, çünkü sonuç 1 trilyon satır olur! 😱
+
+CROSS JOIN mantığı oturdu mu? İsterseniz son JOIN türü olan SELF JOIN'e
+(tablonun kendisiyle birleşmesi) geçebiliriz.
+
+
+SELF JOIN 
+
+
+
+
+
+
+
+
+SELF JOIN (Kendiyle Birleştirme), bir tablonun sanki iki farklı tabloymuş gibi
+kendisiyle birleştirilmesidir.
+
+Bunu bir "Aynaya Bakmak" gibi düşünebilirsiniz. Aynı tabloyu alırız, karşısına
+bir ayna koyarız ve tablodaki verileri birbiriyle eşleştiririz. 🪞
+
+1. Neden İhtiyaç Duyarız? (Görsel Senaryo)
+
+En popüler örnek "Çalışanlar ve Müdürler" hiyerarşisidir. Bir şirkette müdür de
+bir çalışandır, memur da. Hepsi aynı Personel tablosundadır.
+
+Tablo: Personel | id | isim | mudur_id | | :--- | :--- | :--- | | 1 | Ahmet |
+NULL (Patron) | | 2 | Ayşe | 1 (Müdürü Ahmet) | | 3 | Mehmet | 1 (Müdürü Ahmet)
+|
+
+Soru: "Ayşe'nin müdürünün adını yanına yaz." Bunun için tabloyu kendisiyle
+birleştirmemiz lazım.
+
+2. Görsel Mantık: Tabloyu İkiye Bölmek
+
+SQL'e bu tabloyu iki farklı isimle (Takma Ad / Alias) tanıtırız:
+
+1.  Tablo A (Çalışanlar)
+2.  Tablo B (Müdürler)
+
+       ÇALIŞANLAR (A)                     MÜDÜRLER (B)
+    -------------------                -------------------
+    isim: Ayşe                         id: 1
+    mudur_id: 1   ---------- Köprü ----------> isim: Ahmet
+
+3. SQL Kodu
+
+SELF JOIN yaparken mutlaka AS kullanarak tablolara farklı isimler vermeliyiz,
+yoksa SQL hangi sütunu nereden alacağını karıştırır.
+
+SELECT 
+    a.isim AS Calisan_Adi, 
+    b.isim AS Mudur_Adi
+FROM 
+    Personel AS a
+INNER JOIN 
+    Personel AS b ON a.mudur_id = b.id;
+
+4. Sonuç (Final Tablosu)
+
+| Calisan\_Adi | Mudur\_Adi |
+| :----------- | :--------- |
+| Ayşe         | Ahmet      |
+| Mehmet       | Ahmet      |
+
+(Not: Ahmet'in müdürü olmadığı için o listede çıkmaz, çünkü INNER JOIN
+kullandık.)
+
+5. Şematik Akış Diagramı
+
+AYNI TABLO
+[ id | isim | mudur_id ]
+      |
+      v
+KOPYALANMIŞ GİBİ DAVRAN (Alias Kullan)
+      |
+   -----------------------
+   |                     |
+[A: Calisanlar]       [B: Yoneticiler]
+   |                     |
+   |--- mudur_id = id ---|  <-- Köprü Burada Kurulur
+
+6. Önemli İpucu: Takma İsimler (Aliases)
+
+SELF JOIN'in en kritik noktası şudur:
+
+  - Personel AS e (e = employee / çalışan)
+  - Personel AS m (m = manager / müdür)
+
+Eğer bu takma isimleri (e ve m) kullanmazsanız, SQL "Aynı tablodan
+bahsediyorsun, hangi kolonu kastediyorsun anlamadım" diyerek hata verir.
+
+Özet: SELF JOIN = "Bir tabloyu ikiye bölüp, içindeki ilişkileri (örneğin
+müdür-çalışan) bulma işlemidir."
+
+JOIN türlerini bitirdik! Gerçekten harika ilerlediniz. SQL'in en zor
+kısımlarından birini başarıyla geçtiniz. Başka bir SQL konusuyla devam etmek
+ister misiniz? (Örneğin: Group By veya Subqueries)
+
