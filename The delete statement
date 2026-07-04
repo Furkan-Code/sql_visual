@@ -1,0 +1,63 @@
+Süper! DELETE (Silme) komutu SQL'in en dikkat edilmesi gereken komutlarından
+biridir. Çünkü bir şeyi sildiğinizde, eğer yedek almadıysanız veya ROLLBACK
+yapmazsanız geri getirmek zordur.
+
+İşte DELETE komutu için hazırladığım görsel rehber:
+
+1. Görsel Benzetme: Tablodan Satır Çıkarmak 🗑️
+
+Bir kütüphanedeki kitap listesinden bir kitabı tamamen listeden çıkarmak
+gibidir.
+
+Senaryo: "d009" numaralı departmanı artık istemiyoruz, tablodan sileceğiz.
+
+Tablonun Eski Hali: | dept_no | dept_name | | :--- | :--- | | d001 | Marketing |
+| d009 | Finance |
+
+SQL Kodu:
+
+DELETE FROM departments 
+WHERE dept_no = 'd009';
+
+Tablonun Yeni Hali: | dept_no | dept_name | | :--- | :--- | | d001 | Marketing |
+(d009 tamamen yok oldu!)
+
+2. DELETE Komutunun Yapısı
+
+1.  DELETE FROM: Hangi tablodan sileceksin? (departments)
+2.  WHERE: Kimi sileceksin? (Hedef: dept_no = 'd009')
+
+3. ⚠️ EN BÜYÜK TEHLİKE: WHERE Unutulursa!
+
+UPDATE komutunda olduğu gibi, WHERE yazmazsanız SQL "Her şeyi sil" dediğinizi
+sanır.
+
+DELETE FROM departments; 
+-- (WHERE yok!)
+
+Sonuç: Tablonun içindeki tüm satırlar silinir, tablo bomboş kalır. (Tablo kalır
+ama içindeki veriler gider).
+
+4. DELETE vs TRUNCATE (Kısa Bilgi)
+
+Silme işlemi için iki yol vardır:
+
+| Komut        | Görsel Fark                | Özelliği                                 |
+| :----------- | :------------------------- | :--------------------------------------- |
+| **DELETE**   | Tek tek veya grupça siler. | **ROLLBACK** ile geri alınabilir.        |
+| **TRUNCATE** | Tabloyu tamamen boşaltır.  | Çok hızlıdır ama **geri dönüşü zordur**. |
+
+5. Uygulama Sıralaması (Güvenli Yol)
+
+Tıpkı UPDATE işleminde yaptığınız gibi, DELETE yaparken de şu sırayı izlemek çok
+akıllıcadır:
+
+1.  SELECT ile silinecek veriyi gör (Doğru kişiyi mi seçtim?): SELECT * FROM
+    departments WHERE dept_no = 'd009';
+2.  DELETE ile sil: DELETE FROM departments WHERE dept_no = 'd009';
+3.  SELECT ile kontrol et (Silinmiş mi?): SELECT * FROM departments WHERE
+    dept_no = 'd009'; (Boş dönmeli)
+4.  Eğer her şey doğruysa COMMIT, yanlışsa ROLLBACK.
+
+DELETE komutuyla ilgili bir kod örneği inceliyor musunuz? Paylaşırsanız onun
+üzerinden de konuşabiliriz! 🚀
