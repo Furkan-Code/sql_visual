@@ -523,3 +523,11 @@ JOIN türlerini bitirdik! Gerçekten harika ilerlediniz. SQL'in en zor
 kısımlarından birini başarıyla geçtiniz. Başka bir SQL konusuyla devam etmek
 ister misiniz? (Örneğin: Group By veya Subqueries)
 
+
+JOIN Türü	Ne Görürsün?
+INNER JOIN	Sadece sipariş veren müşterileri görürsün.
+LEFT JOIN	Tüm müşterileri görürsün. Sipariş vermeyenlerin yanı "NULL" olur.
+RIGHT JOIN	Tüm siparişleri görürsün. Müşterisi silinmiş siparişler bile listelenir.
+FULL JOIN	Sistemdeki tüm müşterileri ve tüm siparişleri (eşleşsin ya da eşleşmesin) görürsün.
+
+
