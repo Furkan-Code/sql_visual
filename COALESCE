@@ -166,3 +166,139 @@ doğru tanım.
 
 Başka sormak istediğin bir şey var mı? Çok iyi ilerliyorsun! 👏
 
+
+
+
+
+Merhaba, SQL'deki COALESCE() fonksiyonunu senin için en görsel ve en sade
+şekilde açıklayacağım.
+
+İşitme engelli bireyler için görsel hafıza çok güçlüdür, bu yüzden bu konuyu
+"Yedek Plan" mantığıyla kutular üzerinden gidelim.
+
+1. Mantık Nedir? (Görsel Akış)
+
+COALESCE(değer1, değer2, değer3) şuna benzer: Sırayla kutulara bakar. NULL (Boş)
+olanları geçer, ilk bulduğu dolu değeri alır.
+
+Görsel Senaryo: Bir müşterinin iletişim bilgisini almak istiyoruz.
+
+1.  Ev Telefonu: (Boş mu? ❌ Evet) -> Bir sonrakine bak.
+2.  İş Telefonu: (Boş mu? ❌ Evet) -> Bir sonrakine bak.
+3.  Cep Telefonu: (Boş mu? ✅ Hayır, dolu!) -> Bunu al!
+
+2. Tablo Üzerinde Görelim
+
+Elimizde bir Kullanıcılar tablosu olsun:
+
+| İsim   | Cep Telefonu | Ev Telefonu | Sabit Hat |
+| :----- | :----------- | :---------- | :-------- |
+| Ahmet  | NULL         | NULL        | 0212...   |
+| Ayşe   | 0532...      | NULL        | NULL      |
+| Mehmet | NULL         | 0216...     | NULL      |
+
+Soru: Herkesin ulaşılabilecek ilk numarasını nasıl buluruz?
+
+SQL Kodu:
+
+SELECT İsim, COALESCE(Cep_Telefonu, Ev_Telefonu, Sabit_Hat) AS Ulasim_No
+FROM Kullanıcılar;
+
+Sonuç Şöyle Olur:
+
+  - Ahmet: (Boş, Boş, 0212...) -> Sonuç: 0212...
+  - Ayşe: (0532..., Boş, Boş) -> Sonuç: 0532... (İlk dolu olanı hemen yakaladı)
+  - Mehmet: (Boş, 0216..., Boş) -> Sonuç: 0216...
+
+3. En Çok Kullanılan Yer: "Varsayılan Değer" Atamak
+
+Bazen tabloda veri boştur (NULL). Biz ekranda "Boş" yazmasını istemeyiz, yerine
+bir yazı yazmasını isteriz.
+
+Görsel Örnek: Eğer kişinin e-posta adresi yoksa, ekrana "E-posta girilmemiş"
+yazalım.
+
+SELECT COALESCE(Eposta, 'E-posta girilmemiş') FROM Uyeler;
+
+Mantık Çizelgesi: | Eposta Sütunu | Sonuç | Açıklama | | :--- | :--- | :--- | |
+ali@mail.com | ali@mail.com | Dolu olduğu için kendisini aldı. | | NULL (Boş) |
+E-posta girilmemiş | Boş olduğu için yedek yazıyı aldı. |
+
+Özetle COALESCE:
+
+  - NULL (boşluk) sevmez.
+  - Soldan sağa doğru okur.
+  - İlk bulduğu dolu veriyi ekrana basar.
+  - Eğer hepsi boşsa, en sonuncuyu (varsa) basar.
+
+Anlatımı senin için net oldu mu? Başka bir SQL komutunu da bu şekilde
+görselleştirmemi ister misin?
+
+
+
+IFNULL() fonksiyonu, az önce öğrendiğin COALESCE() fonksiyonunun daha basit ve
+küçük kardeşidir.
+
+En büyük fark şudur:
+
+  - COALESCE: İstediğin kadar (10 tane bile) kutuya bakabilir.
+  - IFNULL: Sadece 2 kutuya bakar.
+
+1. Görsel Mantık: "Yedek Lastik"
+
+Bunu bir araba gibi düşün. Eğer ana lastiğin patlaksa (NULL ise), yedek lastiği
+takarsın.
+
+Kural: IFNULL( 1. Seçenek , 2. Seçenek )
+
+1.  Eğer 1. Seçenek doluysa; onu al.
+2.  Eğer 1. Seçenek boş (NULL) ise; mecburen 2. Seçenek (yedeği) al.
+
+2. Tablo Üzerinde Görsel Örnek
+
+Bir marketin stok tablosuna bakalım. Bazı ürünlerin miktarı girilmemiş (NULL).
+
+| Ürün Adı | Stok Miktarı        |
+| :------- | :------------------ |
+| Elma     | 50                  |
+| Armut    | **NULL** (Belirsiz) |
+| Muz      | 20                  |
+
+Soru: Stok miktarı boş olanlara "0" (sıfır) yazalım ki kafamız karışmasın.
+
+SQL Kodu:
+
+SELECT Ürün_Adı, IFNULL(Stok_Miktarı, 0) AS Son_Durum
+FROM Market;
+
+Görsel İşleyiş:
+
+  - Elma için: IFNULL(50, 0) -> 50 boş mu? Hayır. Sonuç: 50
+  - Armut için: IFNULL(NULL, 0) -> Birinci kutu boş mu? Evet! Sonuç: 0 (Yedek)
+  - Muz için: IFNULL(20, 0) -> 20 boş mu? Hayır. Sonuç: 20
+
+3. COALESCE ile IFNULL Arasındaki Fark (Görsel Karşılaştırma)
+
+| Özellik         | IFNULL                              | COALESCE                                |
+| :-------------- | :---------------------------------- | :-------------------------------------- |
+| **Kutu Sayısı** | Sadece 2 tane                       | Sınırsız (2, 3, 10...)                  |
+| **Hız**         | Çok basit olduğu için çok hızlıdır. | Esnek olduğu için çok az daha yavaştır. |
+| **Kullanım**    | `IFNULL(A, B)`                      | `COALESCE(A, B, C, D, ...)`             |
+
+Özet Grafik
+
+Girdi: IFNULL(A, B)
+
+    [ A dolu mu? ]
+       /      \
+    EVET      HAYIR
+     |          |
+  A'yı yaz    B'yi yaz
+
+Not: IFNULL fonksiyonu çoğunlukla MySQL veritabanında kullanılır. Eğer SQL
+Server kullanıyorsan adı ISNULL, Oracle kullanıyorsan adı NVL olur ama mantık
+tamamen aynıdır.
+
+Bu anlatım IFNULL mantığını kavramana yardımcı oldu mu?
+
+
