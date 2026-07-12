@@ -89,3 +89,199 @@ JOIN emp_manager e2
 
 Böyle çalıştırınca e1 ve e2'yi yan yana görürsün; sonra SELECT e2.* neden yazılmış çok daha net oturur.
 
+
+
+
+
+
+Tabii. Bu sorgu bir SELF JOIN örneği:
+
+SELECT DISTINCT e1.*
+FROM emp_manager e1
+JOIN emp_manager e2
+    ON e1.emp_no = e2.manager_no;
+
+En basit anlamıyla:
+
+emp_manager tablosunda, çalışan numarası (emp_no) başka bir kaydın yöneticisi (manager_no) olarak geçen e1 kayıtlarını getir.
+
+Örnek tablo
+
+emp_manager tablosu şöyle olsun:
+
+emp_no	manager_no
+10001	110022
+10002	110022
+110022	110039
+110039	110114
+
+Aynı tabloya iki farklı isim veriyoruz:
+
+emp_manager → e1
+emp_manager → e2
+
+SQL şu eşleşmeyi arıyor:
+
+e1.emp_no = e2.manager_no
+İlk eşleşme
+e1 tarafında:
+emp_no = 110022
+manager_no = 110039
+e2 tarafında:
+emp_no = 10001
+manager_no = 110022
+
+Kontrol:
+
+e1.emp_no       = 110022
+e2.manager_no   = 110022
+
+110022 = 110022 ✅
+
+Dolayısıyla eşleşti.
+
+Ama sorgu:
+
+SELECT e1.*
+
+dediği için e1 tarafını gösterir:
+
+emp_no	manager_no
+110022	110039
+Başka bir eşleşme
+
+e1:
+
+110039 | 110114
+
+e2:
+
+110022 | 110039
+
+Kontrol:
+
+e1.emp_no     = 110039
+e2.manager_no = 110039
+
+110039 = 110039 ✅
+
+Sonuçta e1.* gösterilir:
+
+110039 | 110114
+DISTINCT neden var?
+
+Şimdi önemli nokta bu.
+
+110022 yöneticisinin iki çalışanı var:
+
+10001 → manager: 110022
+10002 → manager: 110022
+
+Bu nedenle JOIN sırasında:
+
+e1                         e2
+110022 | 110039    ↔    10001 | 110022
+110022 | 110039    ↔    10002 | 110022
+
+Aynı e1 kaydı iki kez eşleşti.
+
+Eğer:
+
+SELECT e1.*
+
+yazarsak sonuç şöyle olabilir:
+
+emp_no	manager_no
+110022	110039
+110022	110039
+110039	110114
+
+Ama:
+
+SELECT DISTINCT e1.*
+
+yazınca tekrar eden aynı satırlar kaldırılır:
+
+emp_no	manager_no
+110022	110039
+110039	110114
+Sorgunun mantığını tek cümlede söyleyelim
+SELECT DISTINCT e1.*
+FROM emp_manager e1
+JOIN emp_manager e2
+    ON e1.emp_no = e2.manager_no;
+
+➡️ Başka çalışanların manager_no alanında bulunan çalışanların e1 kayıtlarını, tekrar etmeden getirir.
+
+Yani mantık olarak:
+
+e1.emp_no
+     ↓
+Bu numara
+     ↓
+e2.manager_no içinde var mı?
+     ↓
+EVET → e1 satırını getir
+En önemli üç parça
+ON e1.emp_no = e2.manager_no
+
+→ Hangi kayıtlar eşleşecek?
+
+SELECT e1.*
+
+→ Eşleşmenin e1 tarafını göster.
+
+DISTINCT
+
+→ Aynı e1 kaydı birden fazla kez eşleşirse yalnızca bir kez göster.
+
+Bu sorguda asıl yeni konu DISTINCT; Self JOIN mantığını sen zaten anlamıştın.
+
+peki distinct sayısı olan varsa çekiyor aynısı olmayan göstermiyor doğru mu 
+
+Tam olarak değil. 🙂 DISTINCT, “aynısı olmayanı gösterme” demek değildir.
+
+DISTINCT şunu yapar:
+
+Sonuçta aynı satır birden fazla kez varsa, sadece bir tanesini gösterir.
+
+Örneğin JOIN sonucu:
+
+emp_no	manager_no
+110022	110039
+110022	110039
+110039	110114
+DISTINCT olmadan
+
+3 satır gelir.
+
+DISTINCT ile
+SELECT DISTINCT e1.*
+
+Sonuç:
+
+emp_no	manager_no
+110022	110039
+110039	110114
+
+Yani:
+
+2 tane aynı satır varsa → 1 tanesini gösterir ✅
+Sadece 1 tane olan satır varsa → onu da gösterir ✅
+Hiçbir şeyi “aynısı yok” diye silmez ❌
+
+Kısaca:
+
+A
+A
+B
+C
+C
+
+DISTINCT sonrası:
+
+A
+B
+C
+
+Yani tekrarları kaldırır, her farklı değeri/satırı bir kez gösterir.
