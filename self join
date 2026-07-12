@@ -88,3 +88,4 @@ JOIN emp_manager e2
     ON e1.emp_no = e2.manager_no;
 
 Böyle çalıştırınca e1 ve e2'yi yan yana görürsün; sonra SELECT e2.* neden yazılmış çok daha net oturur.
+
