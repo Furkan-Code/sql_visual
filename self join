@@ -1,0 +1,90 @@
+Normal, çünkü self join ilk başta kafa karıştırıyor. 🙂 En basit şekilde düşünelim.
+
+Sorgu:
+
+SELECT e2.*
+FROM emp_manager e1
+JOIN emp_manager e2
+    ON e1.emp_no = e2.manager_no;
+
+e1 ve e2 aynı tablo, sadece SQL karşılaştırma yapabilsin diye iki farklı isim verilmiş:
+
+emp_manager → e1
+emp_manager → e2
+
+Şimdi örnek tablo:
+
+emp_no	manager_no
+10001	110022
+10002	110022
+110022	110039
+
+SQL şu şartı kontrol ediyor:
+
+e1.emp_no = e2.manager_no
+
+Örneğin şu iki satır eşleşir:
+
+e1 tarafı:
+emp_no  | manager_no
+110022  | 110039
+   ↓
+   110022
+
+e2 tarafı:
+emp_no  | manager_no
+10001   | 110022
+          ↑
+          110022
+
+Çünkü:
+
+e1.emp_no = e2.manager_no
+
+110022 = 110022 ✅
+
+Şimdi eşleşme bulundu. Elimizde iki taraf var:
+
+e1                         e2
+------------------         ------------------
+110022 | 110039            10001 | 110022
+SELECT e1.* dersen:
+SELECT e1.*
+
+Sonuç:
+
+110022 | 110039
+SELECT e2.* dersen:
+SELECT e2.*
+
+Sonuç:
+
+10001 | 110022
+SELECT e1.*, e2.* dersen:
+
+İki tarafı da görürsün:
+
+110022 | 110039 | 10001 | 110022
+En önemli ayrım
+ON e1.emp_no = e2.manager_no
+
+➡️ Kim kiminle eşleşecek?
+
+SELECT e2.*
+
+➡️ Eşleşmeden hangi tarafı göstereceğim?
+
+Yani e2.* özel veya zorunlu değil. Sorunun amacı e2 tarafındaki kayıtları göstermek olduğu için yazılmış. e1.* yazarsan sorgu yine çalışır, fakat diğer tarafı gösterir.
+
+Bence self join'i anlamak için bir süre * kullanmadan şöyle yazmak daha kolay:
+
+SELECT
+    e1.emp_no AS e1_employee,
+    e1.manager_no AS e1_manager,
+    e2.emp_no AS e2_employee,
+    e2.manager_no AS e2_manager
+FROM emp_manager e1
+JOIN emp_manager e2
+    ON e1.emp_no = e2.manager_no;
+
+Böyle çalıştırınca e1 ve e2'yi yan yana görürsün; sonra SELECT e2.* neden yazılmış çok daha net oturur.
