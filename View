@@ -1,0 +1,11 @@
+-- 2. ADIM: Değişiklik yapıyoruz
+
+-- YANLIŞ YOL (Hata verir):
+CREATE VIEW Test_View AS 
+SELECT Ad, Soyad FROM Personel; 
+-- ❌ Hata: "Test_View zaten var!"
+
+-- DOĞRU YOL (Başarılı olur):
+CREATE OR REPLACE VIEW Test_View AS 
+SELECT Ad, Soyad FROM Personel; 
+--  Başarılı! Eski View güncellendi.
