@@ -16,3 +16,24 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+
+//SET @sayi1 = 10;
+//SET @sayi2 = 20;
+
+//SELECT @sayi1 + @sayi2;
+
+
+SELECT carp(10, 20);
+
+SET @salary = 0;
+
+CALL emp_avg_salary_out(@salary);
+
+SELECT @salary;
+
+
+salary → procedure içindeki parametre.
+@salary → procedure dışındaki kullanıcı değişkeni.
