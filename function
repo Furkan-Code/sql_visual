@@ -1,0 +1,18 @@
+DELIMITER $$
+
+CREATE FUNCTION carp(sayi1 INT, sayi2 INT)
+RETURNS INT
+
+DETERMINISTIC
+
+BEGIN
+
+    DECLARE carpim_cevabi INT;
+
+    SET carpim_cevabi = sayi1 * sayi2;
+
+    RETURN carpim_cevabi;
+
+END$$
+
+DELIMITER ;
